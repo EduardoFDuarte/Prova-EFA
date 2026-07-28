@@ -4,30 +4,40 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - run: npm install
+
       - run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-          VITE_ADMIN_PASSWORD: ${{ secrets.VITE_ADMIN_PASSWORD }}
+          VITE_SUPABASE_URL: https://dcftrkvnnzjvyhddhxma.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_wKFXBEblamn3_1tbO7bnqg_XXbHULH2
+          VITE_ADMIN_PASSWORD: efa2026
           VITE_BASE_URL: /Prova-EFA/
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-      - uses: actions/deploy-pages@v4
-
-permissions:
-  pages: write
-  id-token: write
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
