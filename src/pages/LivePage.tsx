@@ -30,7 +30,7 @@ export default function LivePage() {
       .select('id')
       .in('status', ['open', 'running'])
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (!ev) return
     setEventId(ev.id)

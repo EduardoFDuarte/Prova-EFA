@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Registration, Poule, Bout, Category } from '../types/database'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Registration, Poule, Bout, Category, Event } from '../types/database'
 import {
   categoryLabel,
   distributeIntoPoules,
@@ -9,7 +8,7 @@ import {
   CATEGORY_TOUCH_LIMIT,
 } from '../utils/poules'
 
-type Tab = 'inscricoes' | 'poules' | 'eliminacao'
+type Tab = 'eventos' | 'inscricoes' | 'poules' | 'eliminacao'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'efa2025'
 
@@ -19,25 +18,43 @@ interface PouleWithData {
   bouts: Bout[]
 }
 
+interface EventWithCount extends Event {
+  registrationCount: number
+}
+
 // ─── Root page ────────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
   const [pw, setPw] = useState('')
-  const [tab, setTab] = useState<Tab>('inscricoes')
+  const [tab, setTab] = useState<Tab>('eventos')
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [poulesData, setPoulesData] = useState<PouleWithData[]>([])
   const [eventId, setEventId] = useState<string | null>(null)
+  const [events, setEvents] = useState<EventWithCount[]>([])
 
-  const fetchEvent = useCallback(async () => {
+  const fetchEvents = useCallback(async () => {
     const { data } = await supabase
       .from('events')
-      .select('id')
-      .in('status', ['open', 'running'])
-      .limit(1)
-      .single()
-    if (data) setEventId(data.id)
-  }, [])
+      .select('*')
+      .order('date', { ascending: false })
+    if (!data) return
+
+    const counts = await Promise.all(
+      data.map(async (ev) => {
+        const { count } = await supabase
+          .from('registrations')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_id', ev.id)
+        return { ...ev, registrationCount: count ?? 0 } as EventWithCount
+      })
+    )
+    setEvents(counts)
+
+    // Auto-select first open/running event
+    const active = counts.find((e) => e.status === 'open' || e.status === 'running')
+    if (active && !eventId) setEventId(active.id)
+  }, [eventId])
 
   const fetchRegistrations = useCallback(async () => {
     if (!eventId) return
@@ -83,7 +100,7 @@ export default function AdminPage() {
     setPoulesData(result)
   }, [eventId])
 
-  useEffect(() => { if (authed) fetchEvent() }, [authed, fetchEvent])
+  useEffect(() => { if (authed) fetchEvents() }, [authed, fetchEvents])
   useEffect(() => {
     if (eventId) { fetchRegistrations(); fetchPoules() }
   }, [eventId, fetchRegistrations, fetchPoules])
@@ -113,11 +130,20 @@ export default function AdminPage() {
     )
   }
 
+  const selectedEvent = events.find((e) => e.id === eventId)
+
   const handleGeneratePoules = async () => {
     await generatePoules(registrations, eventId!)
     await fetchPoules()
     setTab('poules')
   }
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'eventos', label: '📅 Eventos' },
+    { key: 'inscricoes', label: '📋 Inscrições' },
+    { key: 'poules', label: '⚔️ Poules' },
+    { key: 'eliminacao', label: '🏆 Eliminação' },
+  ]
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
@@ -126,22 +152,43 @@ export default function AdminPage() {
         <button className="text-xs text-gray-400 hover:text-red-500" onClick={() => setAuthed(false)}>Sair</button>
       </div>
 
-      {!eventId && <CreateEventPanel onCreated={setEventId} />}
+      {/* Evento ativo */}
+      {selectedEvent && tab !== 'eventos' && (
+        <div className="flex items-center gap-3 bg-efa-blue/5 border border-efa-blue/20 rounded-xl px-4 py-2">
+          <span className="text-xs text-gray-500">Evento ativo:</span>
+          <span className="font-semibold text-efa-blue text-sm">{selectedEvent.name}</span>
+          <span className="text-xs text-gray-400">{new Date(selectedEvent.date).toLocaleDateString('pt-PT')}</span>
+          <span className={`badge ml-auto ${selectedEvent.status === 'open' ? 'bg-green-50 text-green-700' : selectedEvent.status === 'running' ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-500'}`}>
+            {selectedEvent.status === 'open' ? 'Aberto' : selectedEvent.status === 'running' ? 'A decorrer' : 'Terminado'}
+          </span>
+          <button className="text-xs text-efa-blue underline" onClick={() => setTab('eventos')}>Mudar</button>
+        </div>
+      )}
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
-        {(['inscricoes', 'poules', 'eliminacao'] as Tab[]).map((t) => (
+      {/* Tabs */}
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+        {tabs.map(({ key, label }) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-              tab === t ? 'bg-white text-efa-blue shadow' : 'text-gray-500 hover:text-gray-800'
+            key={key}
+            onClick={() => setTab(key)}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap px-2 ${
+              tab === key ? 'bg-white text-efa-blue shadow' : 'text-gray-500 hover:text-gray-800'
             }`}
           >
-            {t === 'inscricoes' ? '📋 Inscrições' : t === 'poules' ? '⚔️ Poules' : '🏆 Eliminação'}
+            {label}
           </button>
         ))}
       </div>
 
+      {tab === 'eventos' && (
+        <EventosTab
+          events={events}
+          selectedEventId={eventId}
+          onSelect={(id) => { setEventId(id); setTab('inscricoes') }}
+          onRefresh={fetchEvents}
+          onCreated={(id) => { fetchEvents(); setEventId(id); setTab('inscricoes') }}
+        />
+      )}
       {tab === 'inscricoes' && (
         <InscricoesTab
           registrations={registrations}
@@ -160,6 +207,102 @@ export default function AdminPage() {
   )
 }
 
+// ─── Eventos Tab ──────────────────────────────────────────────────────────────
+
+function EventosTab({
+  events, selectedEventId, onSelect, onRefresh, onCreated,
+}: {
+  events: EventWithCount[]
+  selectedEventId: string | null
+  onSelect: (id: string) => void
+  onRefresh: () => void
+  onCreated: (id: string) => void
+}) {
+  const [showCreate, setShowCreate] = useState(false)
+
+  const statusLabel: Record<string, string> = {
+    open: 'Aberto',
+    running: 'A decorrer',
+    finished: 'Terminado',
+  }
+  const statusColor: Record<string, string> = {
+    open: 'bg-green-50 text-green-700',
+    running: 'bg-blue-50 text-blue-700',
+    finished: 'bg-gray-50 text-gray-500',
+  }
+
+  const updateStatus = async (id: string, status: string) => {
+    await supabase.from('events').update({ status }).eq('id', id)
+    onRefresh()
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-600">{events.length} evento(s) encontrado(s)</p>
+        <div className="flex gap-2">
+          <button className="btn-outline text-sm py-1" onClick={onRefresh}>↻ Atualizar</button>
+          <button className="btn-gold text-sm py-1" onClick={() => setShowCreate(!showCreate)}>
+            {showCreate ? 'Cancelar' : '+ Novo evento'}
+          </button>
+        </div>
+      </div>
+
+      {showCreate && (
+        <CreateEventPanel onCreated={(id) => { setShowCreate(false); onCreated(id) }} />
+      )}
+
+      {events.length === 0 && !showCreate && (
+        <div className="text-center py-12 text-gray-400">
+          <p className="text-3xl mb-2">📅</p>
+          <p className="text-sm">Nenhum evento criado ainda.</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {events.map((ev) => (
+          <div key={ev.id} className={`card space-y-3 border-l-4 ${selectedEventId === ev.id ? 'border-efa-gold' : 'border-gray-200'}`}>
+            <div className="flex items-start justify-between flex-wrap gap-2">
+              <div>
+                <h3 className="font-bold text-efa-blue">{ev.name}</h3>
+                <p className="text-xs text-gray-400">{new Date(ev.date).toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`badge font-semibold ${statusColor[ev.status]}`}>{statusLabel[ev.status]}</span>
+                <span className="badge bg-efa-blue/10 text-efa-blue font-semibold">{ev.registrationCount} inscritos</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 flex-wrap">
+              <button
+                className={`text-sm px-3 py-1 rounded-lg font-semibold transition-colors ${selectedEventId === ev.id ? 'bg-efa-gold text-white' : 'btn-outline'}`}
+                onClick={() => onSelect(ev.id)}
+              >
+                {selectedEventId === ev.id ? '✓ Selecionado' : 'Selecionar'}
+              </button>
+              {ev.status === 'open' && (
+                <button onClick={() => updateStatus(ev.id, 'running')} className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                  Iniciar prova
+                </button>
+              )}
+              {ev.status === 'running' && (
+                <button onClick={() => updateStatus(ev.id, 'finished')} className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">
+                  Terminar prova
+                </button>
+              )}
+              {ev.status === 'finished' && (
+                <button onClick={() => updateStatus(ev.id, 'open')} className="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                  Reabrir
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ─── Create Event ─────────────────────────────────────────────────────────────
 
 function CreateEventPanel({ onCreated }: { onCreated: (id: string) => void }) {
@@ -174,15 +317,14 @@ function CreateEventPanel({ onCreated }: { onCreated: (id: string) => void }) {
       .from('events')
       .insert({ name: name.trim(), date, status: 'open' })
       .select('id')
-      .single()
+      .maybeSingle()
     if (data) onCreated(data.id)
     setLoading(false)
   }
 
   return (
     <div className="card border-amber-200 bg-amber-50 space-y-3">
-      <h2 className="font-bold text-amber-800">🆕 Criar Evento</h2>
-      <p className="text-xs text-amber-700">Nenhum evento ativo encontrado. Crie um para começar.</p>
+      <h2 className="font-bold text-amber-800">🆕 Novo Evento</h2>
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
           <label className="label">Nome da prova</label>
@@ -203,10 +345,7 @@ function CreateEventPanel({ onCreated }: { onCreated: (id: string) => void }) {
 // ─── Inscrições Tab ───────────────────────────────────────────────────────────
 
 function InscricoesTab({
-  registrations,
-  eventId,
-  onRefresh,
-  onGeneratePoules,
+  registrations, eventId, onRefresh, onGeneratePoules,
 }: {
   registrations: Registration[]
   eventId: string | null
@@ -229,9 +368,11 @@ function InscricoesTab({
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <p className="text-sm text-gray-600">
-          Total: <strong>{registrations.length}</strong> · <span className="text-green-600">{approved.length} aprovadas</span>
-        </p>
+        <div className="flex gap-3 text-sm">
+          <span className="text-gray-600">Total: <strong>{registrations.length}</strong></span>
+          <span className="text-green-600">Aprovados: <strong>{approved.length}</strong></span>
+          <span className="text-yellow-600">Pendentes: <strong>{registrations.filter(r => r.status === 'pending').length}</strong></span>
+        </div>
         <div className="flex gap-2">
           <button className="btn-outline text-sm py-1" onClick={onRefresh}>↻ Atualizar</button>
           {approved.length >= 2 && (
@@ -248,26 +389,19 @@ function InscricoesTab({
 
       {Object.entries(byCategory).map(([cat, regs]) => (
         <div key={cat} className="space-y-2">
-          <h3 className="font-bold text-efa-blue text-sm">{categoryLabel(cat)} ({regs.length})</h3>
+          <h3 className="font-bold text-efa-blue text-sm border-b pb-1">{categoryLabel(cat)} ({regs.length})</h3>
           {regs.map((r) => (
             <div key={r.id} className="card flex flex-wrap items-center gap-3 justify-between">
               <div>
                 <p className="font-medium text-sm">{r.athlete_name}</p>
                 <p className="text-xs text-gray-500">{r.club_name} · {r.birth_year}</p>
                 <div className="flex gap-1 mt-1 flex-wrap">
-                  <span className={`badge ${r.is_federated ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'}`}>
-                    FPE {r.is_federated ? '✓' : '✗'}
-                  </span>
-                  <span className={`badge ${r.has_insurance ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                    Seguro {r.has_insurance ? '✓' : '✗'}
-                  </span>
+                  <span className={`badge ${r.is_federated ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'}`}>FPE {r.is_federated ? '✓' : '✗'}</span>
+                  <span className={`badge ${r.has_insurance ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>Seguro {r.has_insurance ? '✓' : '✗'}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`badge font-semibold ${
-                  r.status === 'approved' ? 'bg-green-50 text-green-700' :
-                  r.status === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'
-                }`}>
+                <span className={`badge font-semibold ${r.status === 'approved' ? 'bg-green-50 text-green-700' : r.status === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-yellow-50 text-yellow-700'}`}>
                   {r.status === 'approved' ? 'Aprovado' : r.status === 'rejected' ? 'Rejeitado' : 'Pendente'}
                 </span>
                 {r.status !== 'approved' && (
@@ -285,7 +419,7 @@ function InscricoesTab({
       {registrations.length === 0 && (
         <div className="text-center py-12 text-gray-400">
           <p className="text-3xl mb-2">📭</p>
-          <p className="text-sm">Sem inscrições ainda.</p>
+          <p className="text-sm">Sem inscrições para este evento.</p>
         </div>
       )}
     </div>
@@ -338,7 +472,6 @@ function PoulesTab({
           <h2 className="text-base font-bold text-efa-blue border-b pb-1">
             {categoryLabel(cat)} · {CATEGORY_TOUCH_LIMIT[cat]} toques por combate
           </h2>
-
           {pds.map((pd) => {
             const membersAsRegistrations = pd.memberships.map((m) => ({
               registration_id: m.id,
@@ -353,7 +486,6 @@ function PoulesTab({
                   <TrackEditor pouleId={pd.poule.id} current={pd.poule.track} onSave={onRefresh} />
                 </div>
 
-                {/* Standings */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
@@ -368,24 +500,17 @@ function PoulesTab({
                     <tbody>
                       {standings.map((s, i) => (
                         <tr key={s.registrationId} className={`border-b border-gray-50 ${i === 0 ? 'font-semibold text-efa-blue' : ''}`}>
-                          <td className="py-1.5">
-                            <span className="text-gray-400 mr-1">{i + 1}.</span>
-                            {s.athleteName}
-                            <span className="text-gray-400 text-[10px] ml-1">({s.clubName})</span>
-                          </td>
+                          <td className="py-1.5"><span className="text-gray-400 mr-1">{i + 1}.</span>{s.athleteName}<span className="text-gray-400 text-[10px] ml-1">({s.clubName})</span></td>
                           <td className="text-center">{s.victories}/{s.matchesPlayed}</td>
                           <td className="text-center">{s.touchesScored}</td>
                           <td className="text-center">{s.touchesReceived}</td>
-                          <td className={`text-center ${s.indicator > 0 ? 'text-green-600' : s.indicator < 0 ? 'text-red-500' : ''}`}>
-                            {s.indicator > 0 ? '+' : ''}{s.indicator}
-                          </td>
+                          <td className={`text-center ${s.indicator > 0 ? 'text-green-600' : s.indicator < 0 ? 'text-red-500' : ''}`}>{s.indicator > 0 ? '+' : ''}{s.indicator}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                {/* Bout entry */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Combates</p>
                   {pd.bouts.map((bout) => {
@@ -397,13 +522,9 @@ function PoulesTab({
                     return (
                       <div key={bout.id} className={`flex items-center gap-2 text-sm rounded-lg p-2 ${bout.completed ? 'bg-green-50' : 'bg-gray-50'}`}>
                         <span className="flex-1 text-right text-xs font-medium truncate">{athleteA.athlete_name}</span>
-                        <input type="number" min={0} max={CATEGORY_TOUCH_LIMIT[cat]} className="w-12 text-center border rounded px-1 py-0.5 text-sm"
-                          value={score.a} disabled={bout.completed}
-                          onChange={(e) => setBoutScores((prev) => ({ ...prev, [bout.id]: { ...score, a: e.target.value } }))} />
+                        <input type="number" min={0} max={CATEGORY_TOUCH_LIMIT[cat]} className="w-12 text-center border rounded px-1 py-0.5 text-sm" value={score.a} disabled={bout.completed} onChange={(e) => setBoutScores((prev) => ({ ...prev, [bout.id]: { ...score, a: e.target.value } }))} />
                         <span className="text-gray-400 text-xs">vs</span>
-                        <input type="number" min={0} max={CATEGORY_TOUCH_LIMIT[cat]} className="w-12 text-center border rounded px-1 py-0.5 text-sm"
-                          value={score.b} disabled={bout.completed}
-                          onChange={(e) => setBoutScores((prev) => ({ ...prev, [bout.id]: { ...score, b: e.target.value } }))} />
+                        <input type="number" min={0} max={CATEGORY_TOUCH_LIMIT[cat]} className="w-12 text-center border rounded px-1 py-0.5 text-sm" value={score.b} disabled={bout.completed} onChange={(e) => setBoutScores((prev) => ({ ...prev, [bout.id]: { ...score, b: e.target.value } }))} />
                         <span className="flex-1 text-xs font-medium truncate">{athleteB.athlete_name}</span>
                         {!bout.completed ? (
                           <button className="text-xs bg-efa-blue text-white px-2 py-1 rounded disabled:opacity-50" disabled={saving === bout.id}
@@ -543,15 +664,13 @@ function EliminacaoTab({ eventId, poulesData }: { eventId: string | null; poules
                 </button>
               )}
             </div>
-
             {matches.length === 0 ? (
               <p className="text-sm text-gray-400">Quadro não gerado. Complete as poules e clique "Gerar Quadro".</p>
             ) : (
               <div className="space-y-2">
                 {matches.map((m) => (
                   <MatchRow key={m.id} match={m} nameA={getAthleteName(m.athlete_a_id)} nameB={getAthleteName(m.athlete_b_id)}
-                    saving={saving === m.id} touchLimit={10}
-                    onSave={(sa, sb) => saveScore(m, sa, sb)} />
+                    saving={saving === m.id} touchLimit={10} onSave={(sa, sb) => saveScore(m, sa, sb)} />
                 ))}
               </div>
             )}
@@ -615,7 +734,7 @@ async function generatePoules(registrations: Registration[], eventId: string) {
     for (let i = 0; i < groups.length; i++) {
       const { data: poule } = await supabase
         .from('poules').insert({ event_id: eventId, category, poule_number: i + 1, track: null })
-        .select('id').single()
+        .select('id').maybeSingle()
       if (!poule) continue
 
       await supabase.from('poule_memberships').insert(
