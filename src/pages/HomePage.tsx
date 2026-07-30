@@ -1,27 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const schedule = [
-  {
-    day: 'Sábado',
-    color: 'bg-blue-50 border-blue-200',
-    events: [
-      { time: '09h00', label: 'Benjamins Individual', note: 'Poules 3 toques' },
-      { time: '11h20', label: 'Cerimónia Protocolar', note: 'Entrega de prémios' },
-      { time: '13h00', label: 'Benjamins Equipas', note: '18 toques totais' },
-      { time: '16h15', label: 'Cerimónia Protocolar', note: 'Entrega de prémios' },
-    ],
-  },
-  {
-    day: 'Domingo',
-    color: 'bg-amber-50 border-amber-200',
-    events: [
-      { time: '09h00', label: 'Infantis Individual', note: 'Poules 4 toques + eliminação' },
-      { time: '12h15', label: 'Cerimónia Protocolar', note: 'Entrega de prémios' },
-      { time: '13h00', label: 'Infantis Equipas', note: '27 toques totais' },
-      { time: '16h15', label: 'Cerimónia Protocolar', note: 'Entrega de prémios' },
-    ],
-  },
-]
+
 
 const escaloes = [
   {
@@ -110,23 +89,7 @@ export default function HomePage() {
       <section className="space-y-4">
         <h2 className="text-lg font-bold text-efa-blue">📅 Programa da Competição</h2>
         <div className="grid sm:grid-cols-2 gap-4">
-          {schedule.map((day) => (
-            <div key={day.day} className={`rounded-xl border-2 p-4 ${day.color}`}>
-              <h3 className="font-bold text-base mb-3 text-efa-blue">{day.day}</h3>
-              <div className="space-y-2">
-                {day.events.map((ev) => (
-                  <div key={ev.time} className="flex gap-3 text-sm">
-                    <span className="font-mono font-semibold text-efa-blue w-12 shrink-0">{ev.time}</span>
-                    <div>
-                      <span className="font-medium">{ev.label}</span>
-                      <span className="text-gray-500 text-xs block">{ev.note}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+                 </div>
       </section>
 
       {/* Escalões */}
