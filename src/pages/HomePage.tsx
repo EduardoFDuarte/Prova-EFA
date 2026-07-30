@@ -85,13 +85,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* Programa */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-bold text-efa-blue">📅 Programa da Competição</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-                 </div>
-      </section>
-
+      
       {/* Escalões */}
       <section className="space-y-4">
         <h2 className="text-lg font-bold text-efa-blue">🤺 Escalões</h2>
