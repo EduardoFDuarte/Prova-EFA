@@ -67,7 +67,7 @@ export default function HomePage() {
         {/* Center logo watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <img
-            src="/efa_logo.jpeg"
+            src={`${import.meta.env.BASE_URL}efa_logo.jpeg`}
             alt=""
             className="w-[420px] h-[420px] object-cover rounded-full opacity-[0.07] blur-sm"
           />
@@ -112,7 +112,7 @@ export default function HomePage() {
           {/* Right: logo + side navigation */}
           <div className="hidden lg:flex flex-col items-center gap-8">
             <img
-              src="/efa_logo.jpeg"
+              src={`${import.meta.env.BASE_URL}efa_logo.jpeg`}
               alt="Evolution Fencing Academy"
               className="w-56 h-56 rounded-full object-cover border-2 border-efa-gold/40 shadow-[0_0_60px_rgba(201,168,76,0.15)]"
             />
@@ -251,7 +251,7 @@ export default function HomePage() {
 
       {/* ── CTA bottom ── */}
       <section className="py-16 px-6 border-t border-efa-gold/20 bg-black text-center space-y-5">
-        <img src="/efa_logo.jpeg" alt="EFA" className="w-16 h-16 rounded-full object-cover mx-auto border border-efa-gold/30" />
+        <img src={`${import.meta.env.BASE_URL}efa_logo.jpeg`} alt="EFA" className="w-16 h-16 rounded-full object-cover mx-auto border border-efa-gold/30" />
         <h2 className="text-2xl font-black tracking-wide">Pronto para competir?</h2>
         <p className="text-gray-400 text-sm">Inscreve o teu clube e entra no circuito.</p>
         <Link
