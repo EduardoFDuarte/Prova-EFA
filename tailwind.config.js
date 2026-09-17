@@ -5,9 +5,9 @@ export default {
     extend: {
       colors: {
         efa: {
-          blue: '#1a3a5c',
+          blue: '#0f0f0f',
           gold: '#c9a84c',
-          light: '#f0f4f8',
+          light: '#f5f0e8',
         },
       },
     },
