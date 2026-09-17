@@ -18,7 +18,7 @@ export default function App() {
             <Route path="/live" element={<LivePage />} />
           </Routes>
         </main>
-        <footer className="bg-efa-blue text-white text-center text-xs py-3 mt-8">
+        <footer className="bg-black text-gray-600 text-center text-xs py-4 border-t border-efa-gold/10 tracking-widest uppercase">
           © {new Date().getFullYear()} Evolution Fencing Academy · Training for Life
         </footer>
       </div>

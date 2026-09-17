@@ -42,78 +42,156 @@ const regulamento = [
   { icon: '🏅', title: 'Prémios', text: 'Medalhas, troféus, Prémio Fair Play e reconhecimento da evolução individual.' },
 ]
 
+const sideLinks = [
+  { label: 'Formação', href: '#filosofia' },
+  { label: 'Escalões', href: '#escaloes' },
+  { label: 'Regulamento', href: '#regulamento' },
+  { label: 'Objetivos', href: '#objetivos' },
+]
+
 export default function HomePage() {
   return (
-    <div className="space-y-0">
-      {/* Hero */}
-      <section className="relative bg-black text-white py-20 px-6 text-center overflow-hidden">
-        {/* decorative gold lines */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{ backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
-        <div className="relative z-10 max-w-3xl mx-auto space-y-5">
-          <div className="inline-block border border-efa-gold text-efa-gold px-5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
-            Training for Life
+    <div className="bg-black text-white">
+      {/* ── HERO ── */}
+      <section className="relative min-h-[88vh] flex items-center overflow-hidden">
+        {/* Dark gradient background with subtle texture */}
+        <div className="absolute inset-0 bg-black" />
+        {/* Gold diagonal lines texture */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 60px)',
+          }}
+        />
+
+        {/* Center logo watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <img
+            src="/efa_logo.jpeg"
+            alt=""
+            className="w-[420px] h-[420px] object-cover rounded-full opacity-[0.07] blur-sm"
+          />
+        </div>
+
+        {/* Left content */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 flex items-center gap-12">
+          <div className="flex-1 space-y-7 max-w-xl">
+            <div className="flex items-center gap-3">
+              <div className="h-0.5 w-12 bg-efa-gold" />
+              <span className="text-efa-gold text-xs font-bold tracking-[0.3em] uppercase">Training for Life</span>
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl font-black leading-[1.05] tracking-tight">
+              EVOLUTION<br />
+              FENCING<br />
+              ACADEMY<br />
+              <span className="text-efa-gold">CIRCUIT</span>
+            </h1>
+
+            <p className="text-gray-400 text-sm tracking-[0.2em] uppercase font-medium">
+              Competir · Aprender · Evoluir
+            </p>
+
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link
+                to="/live"
+                className="flex items-center gap-2 border border-efa-gold text-efa-gold px-7 py-3 text-xs font-bold tracking-widest uppercase hover:bg-efa-gold hover:text-black transition-all"
+              >
+                <span className="live-pulse" />
+                Ver ao Vivo
+              </Link>
+              <Link
+                to="/inscricao"
+                className="border border-white/30 text-white/70 px-7 py-3 text-xs font-bold tracking-widest uppercase hover:border-white hover:text-white transition-all"
+              >
+                Inscrever Clube
+              </Link>
+            </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black leading-tight">
-            Evolution Fencing Academy
-            <br />
-            <span className="text-efa-gold">Circuit</span>
-          </h1>
-          <p className="text-gray-300 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-            Criado para proporcionar mais oportunidades competitivas aos jovens atletas, privilegiando
-            a aprendizagem, a diversão, a evolução e o espírito de equipa acima do resultado competitivo.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 pt-2">
-            <Link
-              to="/live"
-              className="flex items-center gap-2 bg-efa-gold text-black font-bold px-6 py-2.5 rounded-full text-sm hover:brightness-110 transition-all"
-            >
-              <span className="live-pulse" /> Ver ao vivo
-            </Link>
-            <Link
-              to="/inscricao"
-              className="border border-white text-white font-semibold px-6 py-2.5 rounded-full text-sm hover:bg-white hover:text-black transition-all"
-            >
-              Inscrever clube
-            </Link>
+
+          {/* Right: logo + side navigation */}
+          <div className="hidden lg:flex flex-col items-center gap-8">
+            <img
+              src="/efa_logo.jpeg"
+              alt="Evolution Fencing Academy"
+              className="w-56 h-56 rounded-full object-cover border-2 border-efa-gold/40 shadow-[0_0_60px_rgba(201,168,76,0.15)]"
+            />
+            <div className="space-y-2 text-right">
+              <p className="text-efa-gold/50 text-[10px] tracking-[0.3em] uppercase mb-3">Mais do que uma competição</p>
+              {sideLinks.map((l, i) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  className="flex items-center justify-end gap-3 text-xs tracking-widest uppercase text-gray-400 hover:text-efa-gold transition-colors group"
+                >
+                  <span>{i + 1}. {l.label}</span>
+                  <span className="w-5 h-0.5 bg-gray-600 group-hover:bg-efa-gold transition-colors" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom gold bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-efa-gold to-transparent" />
+      </section>
+
+      {/* ── FILOSOFIA ── */}
+      <section id="filosofia" className="py-20 px-6 border-b border-white/5">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-0.5 w-8 bg-efa-gold" />
+            <h2 className="text-efa-gold text-xs font-bold tracking-[0.3em] uppercase">Filosofia</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-10 items-center">
+            <div className="space-y-5">
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Na <strong className="text-white">Evolution Fencing Academy</strong> acreditamos que o mais importante
+                não é ganhar uma prova, mas sim{' '}
+                <em className="text-efa-gold not-italic font-semibold">participar, aprender e evoluir</em>,
+                tanto como atleta como enquanto pessoa.
+              </p>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Cada competição representa uma oportunidade para desenvolver competências técnicas, fortalecer
+                valores como o respeito, a disciplina e o espírito de equipa, e criar experiências que contribuam
+                para o crescimento desportivo, pessoal e humano de cada participante.
+              </p>
+            </div>
+            <div className="border-l border-efa-gold/30 pl-8 space-y-3">
+              <p className="text-efa-gold/80 text-lg font-light italic leading-relaxed">
+                "Bem-vindos ao lugar onde cada toque é mais um passo na vossa evolução."
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="h-0.5 w-8 bg-efa-gold/40" />
+                <span className="text-efa-gold/40 text-xs tracking-widest uppercase">EFA Circuit</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Gold divider */}
-      <div className="h-1 bg-efa-gold" />
-
-      <div className="max-w-4xl mx-auto px-4 py-10 space-y-12">
-        {/* Filosofia */}
-        <section className="bg-zinc-950 border border-zinc-800 rounded-xl p-6 space-y-3">
-          <h2 className="text-lg font-bold text-efa-gold flex items-center gap-2">📖 Filosofia</h2>
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Na <strong className="text-white">Evolution Fencing Academy</strong> acreditamos que o mais importante não é ganhar uma prova,
-            mas sim <em className="text-efa-gold">participar, aprender e evoluir</em>, tanto como atleta como enquanto pessoa.
-            Cada competição representa uma oportunidade para desenvolver competências técnicas, fortalecer
-            valores como o respeito, a disciplina e o espírito de equipa, e criar experiências que contribuam
-            para o crescimento desportivo, pessoal e humano de cada participante.
-          </p>
-          <p className="text-efa-gold font-semibold text-sm italic border-l-2 border-efa-gold pl-3">
-            "Bem-vindos ao lugar onde cada toque é mais um passo na vossa evolução."
-          </p>
-        </section>
-
-        {/* Escalões */}
-        <section className="space-y-5">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            🤺 <span>Escalões</span>
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-4">
+      {/* ── ESCALÕES ── */}
+      <section id="escaloes" className="py-20 px-6 border-b border-white/5">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <div className="flex items-center gap-4">
+            <div className="h-0.5 w-8 bg-efa-gold" />
+            <h2 className="text-efa-gold text-xs font-bold tracking-[0.3em] uppercase">Escalões</h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
             {escaloes.map((e) => (
-              <div key={e.name} className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-3 border-t-2 border-t-efa-gold">
+              <div
+                key={e.name}
+                className="border border-white/10 bg-white/[0.02] p-6 space-y-4 hover:border-efa-gold/40 transition-colors group"
+              >
                 <div className="text-2xl">{e.icon}</div>
-                <h3 className="font-bold text-white">{e.name}</h3>
-                <p className="text-xs text-efa-gold font-semibold">{e.age}</p>
-                <ul className="space-y-1.5">
+                <div>
+                  <h3 className="font-bold text-white group-hover:text-efa-gold transition-colors">{e.name}</h3>
+                  <p className="text-efa-gold text-xs font-semibold tracking-widest uppercase mt-0.5">{e.age}</p>
+                </div>
+                <ul className="space-y-2">
                   {e.items.map((item) => (
-                    <li key={item} className="text-xs text-gray-400 flex gap-1.5">
-                      <span className="text-efa-gold mt-0.5 shrink-0">•</span>
+                    <li key={item} className="text-xs text-gray-500 flex gap-2">
+                      <span className="text-efa-gold/60 mt-0.5 shrink-0">—</span>
                       {item}
                     </li>
                   ))}
@@ -121,30 +199,38 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Regulamento */}
-        <section className="space-y-5">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            📋 <span>Regulamento Resumido</span>
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-3">
+      {/* ── REGULAMENTO ── */}
+      <section id="regulamento" className="py-20 px-6 border-b border-white/5">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <div className="flex items-center gap-4">
+            <div className="h-0.5 w-8 bg-efa-gold" />
+            <h2 className="text-efa-gold text-xs font-bold tracking-[0.3em] uppercase">Regulamento</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
             {regulamento.map((r) => (
-              <div key={r.title} className="flex gap-3 bg-zinc-950 border border-zinc-800 rounded-xl p-4 items-start">
+              <div key={r.title} className="flex gap-4 border border-white/5 bg-white/[0.02] p-5 hover:border-efa-gold/20 transition-colors">
                 <span className="text-xl shrink-0">{r.icon}</span>
                 <div>
-                  <h4 className="font-semibold text-sm text-efa-gold">{r.title}</h4>
-                  <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{r.text}</p>
+                  <h4 className="font-bold text-sm text-white mb-1">{r.title}</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">{r.text}</p>
                 </div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Objetivos */}
-        <section className="bg-zinc-950 border border-efa-gold/40 rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-efa-gold">🎯 Objetivos do Circuito</h2>
-          <ul className="grid sm:grid-cols-2 gap-2 text-sm">
+      {/* ── OBJETIVOS ── */}
+      <section id="objetivos" className="py-20 px-6">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <div className="flex items-center gap-4">
+            <div className="h-0.5 w-8 bg-efa-gold" />
+            <h2 className="text-efa-gold text-xs font-bold tracking-[0.3em] uppercase">Objetivos do Circuito</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
             {[
               'Proporcionar mais oportunidades competitivas',
               'Promover a aprendizagem e desenvolvimento técnico',
@@ -154,14 +240,27 @@ export default function HomePage() {
               'Valorizar a participação e evolução individual',
               'Contribuir para o crescimento da Esgrima em Portugal',
             ].map((obj) => (
-              <li key={obj} className="flex gap-2 items-start text-gray-300">
-                <span className="text-efa-gold mt-0.5 shrink-0">✓</span>
-                {obj}
-              </li>
+              <div key={obj} className="flex items-center gap-3 py-3 border-b border-white/5">
+                <span className="text-efa-gold text-lg leading-none">✦</span>
+                <span className="text-gray-300 text-sm">{obj}</span>
+              </div>
             ))}
-          </ul>
-        </section>
-      </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA bottom ── */}
+      <section className="py-16 px-6 border-t border-efa-gold/20 bg-black text-center space-y-5">
+        <img src="/efa_logo.jpeg" alt="EFA" className="w-16 h-16 rounded-full object-cover mx-auto border border-efa-gold/30" />
+        <h2 className="text-2xl font-black tracking-wide">Pronto para competir?</h2>
+        <p className="text-gray-400 text-sm">Inscreve o teu clube e entra no circuito.</p>
+        <Link
+          to="/inscricao"
+          className="inline-block bg-efa-gold text-black font-bold px-8 py-3 text-xs tracking-widest uppercase hover:brightness-110 transition-all"
+        >
+          Inscrever Clube →
+        </Link>
+      </section>
     </div>
   )
 }
