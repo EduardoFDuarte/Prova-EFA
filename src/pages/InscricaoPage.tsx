@@ -88,11 +88,6 @@ export default function InscricaoPage() {
     const err = validate()
     if (err) { setError(err); return }
 
-    if (!token) {
-      setError('Token de acesso inválido. Contacte a organização para obter o link de inscrição.')
-      return
-    }
-
     setSubmitting(true)
     try {
       const rows = athletes.map((a) => ({
@@ -157,13 +152,6 @@ export default function InscricaoPage() {
         <h1 className="text-2xl font-black text-efa-blue">Portal dos Clubes</h1>
         <p className="text-gray-500 text-sm mt-1">Inscrição de atletas para o EFA Circuit</p>
       </div>
-
-      {!token && (
-        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm text-amber-800">
-          <strong>⚠️ Token não encontrado.</strong> Este portal requer um link com token fornecido pela organização.
-          Contacte a Evolution Fencing Academy para obter o seu link personalizado.
-        </div>
-      )}
 
       {openEvents.length === 0 && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-600 text-center">
@@ -294,7 +282,7 @@ export default function InscricaoPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">⚠️ {error}</div>
           )}
 
-          <button type="submit" className="btn-primary w-full py-3 text-base" disabled={submitting || !token}>
+          <button type="submit" className="btn-primary w-full py-3 text-base" disabled={submitting}>
             {submitting ? 'A submeter...' : 'Submeter inscrição'}
           </button>
 
