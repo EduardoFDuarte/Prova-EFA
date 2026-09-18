@@ -43,12 +43,7 @@ const regulamento = [
   { icon: '🏅', title: 'Prémios', text: 'Medalhas, troféus, Prémio Fair Play e reconhecimento da evolução individual.' },
 ]
 
-const sideLinks = [
-  { label: 'Formação', href: '#filosofia' },
-  { label: 'Escalões', href: '#escaloes' },
-  { label: 'Regulamento', href: '#regulamento' },
-  { label: 'Objetivos', href: '#objetivos' },
-]
+
 
 export default function HomePage() {
   return (
@@ -119,16 +114,7 @@ export default function HomePage() {
             />
             <div className="space-y-2 text-right">
               <p className="text-efa-gold/50 text-[10px] tracking-[0.3em] uppercase mb-3">Mais do que uma competição</p>
-              {sideLinks.map((l, i) => (
-                <a
-                  key={l.label}
-                  href={l.href}
-                  className="flex items-center justify-end gap-3 text-xs tracking-widest uppercase text-gray-400 hover:text-efa-gold transition-colors group"
-                >
-                  <span>{i + 1}. {l.label}</span>
-                  <span className="w-5 h-0.5 bg-gray-600 group-hover:bg-efa-gold transition-colors" />
-                </a>
-              ))}
+              
             </div>
           </div>
         </div>
