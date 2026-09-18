@@ -236,6 +236,13 @@ function EventosTab({
     onRefresh()
   }
 
+  const deleteEvent = async (id: string, name: string) => {
+    if (!window.confirm(`Apagar a prova "${name}"? Esta ação não pode ser desfeita.`)) return
+    await supabase.from('registrations').delete().eq('event_id', id)
+    await supabase.from('events').delete().eq('id', id)
+    onRefresh()
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -295,6 +302,12 @@ function EventosTab({
                   Reabrir
                 </button>
               )}
+              <button
+                onClick={() => deleteEvent(ev.id, ev.name)}
+                className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-auto"
+              >
+                🗑 Apagar
+              </button>
             </div>
           </div>
         ))}
