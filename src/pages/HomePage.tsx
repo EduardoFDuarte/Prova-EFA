@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import efaLogo from '../assets/efa_logo.jpeg'
+import efaLogo from '../assets/efa_logo_01.jpg'
 
 const escaloes = [
   {
@@ -70,7 +70,7 @@ export default function HomePage() {
           <img
             src={efaLogo}
             alt=""
-            className="w-[420px] h-[420px] object-cover rounded-full opacity-[0.07] blur-sm"
+            className="w-[420px] h-[420px] object-contain opacity-[0.08] blur-sm"
           />
         </div>
 
@@ -115,7 +115,7 @@ export default function HomePage() {
             <img
               src={efaLogo}
               alt="Evolution Fencing Academy"
-              className="w-56 h-56 rounded-full object-cover border-2 border-efa-gold/40 shadow-[0_0_60px_rgba(201,168,76,0.15)]"
+              className="w-56 h-56 object-cover rounded-full border border-efa-gold/30 drop-shadow-[0_0_30px_rgba(232,184,75,0.3)]"
             />
             <div className="space-y-2 text-right">
               <p className="text-efa-gold/50 text-[10px] tracking-[0.3em] uppercase mb-3">Mais do que uma competição</p>
@@ -252,7 +252,7 @@ export default function HomePage() {
 
       {/* ── CTA bottom ── */}
       <section className="py-16 px-6 border-t border-efa-gold/20 bg-black text-center space-y-5">
-        <img src={efaLogo} alt="EFA" className="w-16 h-16 rounded-full object-cover mx-auto border border-efa-gold/30" />
+        <img src={efaLogo} alt="EFA" className="w-20 h-20 object-cover rounded-full mx-auto border border-efa-gold/20" />
         <h2 className="text-2xl font-black tracking-wide">Pronto para competir?</h2>
         <p className="text-gray-400 text-sm">Inscreve o teu clube e entra no circuito.</p>
         <Link

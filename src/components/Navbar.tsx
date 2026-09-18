@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import efaLogo from '../assets/efa_logo.jpeg'
+import efaLogo from '../assets/efa_logo_01.jpg'
 
 const navItems = [
   { to: '/', label: 'Início' },
@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src={efaLogo} alt="EFA Logo" className="h-12 w-12 rounded-full object-cover" />
+          <img src={efaLogo} alt="EFA Logo" className="h-12 w-12 object-contain" />
           <div className="leading-tight">
             <div className="text-efa-gold text-xl font-black tracking-widest">EFA</div>
             <div className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">Evolution Fencing Academy</div>
