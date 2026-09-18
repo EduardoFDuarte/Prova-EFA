@@ -147,9 +147,10 @@ export default function InscricaoPage() {
   }
 
   return (
+    <div className="min-h-screen bg-gray-50 text-gray-900">
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-black text-efa-blue">Portal dos Clubes</h1>
+        <h1 className="text-2xl font-black text-gray-900">Portal dos Clubes</h1>
         <p className="text-gray-500 text-sm mt-1">Inscrição de atletas para o EFA Circuit</p>
       </div>
 
@@ -205,8 +206,8 @@ export default function InscricaoPage() {
           {/* Atletas */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-efa-blue">🤺 Atletas</h2>
-              <button type="button" onClick={addAthlete} className="btn-outline text-sm py-1">
+              <h2 className="font-bold text-gray-900">🤺 Atletas</h2>
+              <button type="button" onClick={addAthlete} className="text-sm py-1 px-3 rounded-lg font-semibold border-2 border-efa-gold text-efa-gold hover:bg-efa-gold hover:text-black transition-all">
                 + Adicionar atleta
               </button>
             </div>
@@ -291,6 +292,7 @@ export default function InscricaoPage() {
           </p>
         </form>
       )}
+    </div>
     </div>
   )
 }
